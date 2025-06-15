@@ -74,7 +74,13 @@ class Page:
         embeds: list[Embed] = [],
         files: list[File] = [],
     ) -> list[Page]:
-        return [cls(c,[e],[f]) for c,e,f in zip_longest(contents,embeds,files,fillvalue=None)]
+        pages = []
+        for c, e, f in zip_longest(contents, embeds, files, fillvalue=None):
+            filtered_files = [] if f is None else [f]
+            filtered_embeds = [] if e is None else [e]
+            page = cls(c, filtered_embeds, filtered_files)
+            pages.append(page)
+        return pages
 
 
 class Paginator(discord.ui.View):
@@ -264,3 +270,4 @@ class Paginator(discord.ui.View):
     async def stop_pages(self, interaction: Interaction, button: Button):
         await interaction.response.defer()
         await interaction.delete_original_response()
+
